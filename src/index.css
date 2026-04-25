@@ -10,6 +10,10 @@
   }
 }
 
+/* ============================= */
+/* CUSTOM SCROLLBAR */
+/* ============================= */
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px;
 }
@@ -27,55 +31,79 @@
   background: #cbd5e1;
 }
 
+/* ============================= */
+/* BUTTON PRESS EFFECT */
+/* ============================= */
+
 button:active {
   transform: scale(0.98);
 }
+
 /* ============================= */
-/* MOBILE SIDEBAR FIX FOR MEDAI */
+/* MOBILE LAYOUT FIX (MEDAI) */
+/* ONLY APPLIES ON MOBILE */
 /* ============================= */
 
 @media (max-width: 768px) {
-  /* Ensure layout doesn't stay locked */
+
   body {
     overflow-x: hidden;
   }
 
-  /* Sidebar should NOT cover entire screen permanently */
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
+  /* MAIN LAYOUT → STACK VERTICALLY ON MOBILE */
+  .main-container {
+    display: flex !important;
+    flex-direction: column !important;
     height: 100vh;
-    width: 80%;
-    max-width: 300px;
+  }
+
+  /* SIDEBAR → TOP SECTION */
+  .sidebar {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 35vh;
+    overflow-y: auto;
     background: white;
-    z-index: 50;
-    transform: translateX(0);
-    transition: transform 0.3s ease;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    border-bottom: 1px solid #e5e7eb;
   }
 
-  /* Hidden state (IMPORTANT - requires class toggle in React) */
-  .sidebar.closed {
-    transform: translateX(-100%);
-  }
-
-  /* Chat panel should ALWAYS be full width on mobile */
+  /* CHAT PANEL → BOTTOM SECTION */
   .chat-panel {
     width: 100% !important;
+    height: 65vh;
+    overflow-y: auto;
+  }
+
+  /* SAFETY RESET (prevents old flex rules breaking layout) */
+  .chat-panel,
+  .sidebar {
     margin-left: 0 !important;
   }
 
-  /* Prevent overlap issues */
-  .main-container {
-    display: block !important;
+  /* OPTIONAL: smooth scrolling */
+  .sidebar,
+  .chat-panel {
+    scroll-behavior: smooth;
+  }
+}
+@media (max-width: 768px) {
+  /* FORCE FLEX COLUMN ON MAIN WRAPPER */
+  .flex.h-screen {
+    flex-direction: column !important;
   }
 
-  /* Optional overlay background */
-  .sidebar-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 40;
+  /* LEFT PANEL (sidebar) */
+  .flex.h-screen > div:first-child {
+    width: 100% !important;
+    height: 35vh !important;
+    overflow-y: auto;
+  }
+
+  /* RIGHT PANEL (chat) */
+  .flex.h-screen > div:last-child {
+    width: 100% !important;
+    height: 65vh !important;
+    overflow-y: auto;
   }
 }
