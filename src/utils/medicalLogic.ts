@@ -36,7 +36,7 @@ const getModel = () => {
   if (!genAI) return null;
 
   return genAI.getGenerativeModel({
-   model: "gemini-2.5-flash-lite", // ✅ FAST + HIGH QUOTA MODEL
+    model: "gemini-2.5-flash",
     systemInstruction:
       "You are MedAI, a professional and empathetic AI Medical Assistant. " +
       "Provide structured health guidance (hydration, rest, nutrition, risk level). " +
