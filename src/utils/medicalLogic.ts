@@ -9,7 +9,7 @@ console.log("ENV KEY:", import.meta.env.VITE_GEMINI_API_KEY);
  */
 
 // 🔐 API KEY
-const API_KEY: string | undefined = import.meta.env.VITE_GEMINI_API_KEY;
+const API_KEY = (import.meta.env.VITE_GEMINI_API_KEY ?? "").trim();
 
 // 🧪 DEBUG MODE
 const DEBUG = false;
