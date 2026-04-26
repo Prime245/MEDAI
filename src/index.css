@@ -41,49 +41,90 @@ button:active {
 
 /* ============================= */
 /* MOBILE LAYOUT FIX (MEDAI) */
-/* SIDEBAR AND CHAT VISIBLE TOGETHER */
+/* SIDEBAR AND CHAT STACKED + SCROLLABLE */
 /* ============================= */
 
 @media (max-width: 768px) {
   /* Force vertical stack on main container */
   .flex.h-screen {
     flex-direction: column !important;
-  }
-
-  /* Sidebar - visible at top */
-  .sidebar {
-    position: relative !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 40vh !important;
-    transform: none !important;
-    z-index: 1 !important;
+    height: 100vh !important;
     overflow: hidden !important;
   }
 
-  /* Make sidebar inner content scrollable */
-  .sidebar > div {
+  /* Sidebar - visible at top */
+  .mobile-sidebar {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 45vh !important;
+    min-height: 45vh !important;
+    transform: none !important;
+    z-index: 1 !important;
+    overflow: hidden !important;
+    border-right: none !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+
+  /* Mobile sidebar inner content - scrollable */
+  .mobile-sidebar-content {
+    height: 100% !important;
+    max-height: 100% !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    height: 100% !important;
-    padding-bottom: 1rem !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 1rem !important;
+    box-sizing: border-box !important;
   }
 
   /* Chat panel - visible at bottom */
   .chat-panel {
     width: 100% !important;
-    height: 60vh !important;
+    height: 55vh !important;
+    min-height: 55vh !important;
     position: relative !important;
+    overflow: hidden !important;
   }
 
-  /* Hide mobile toggle button */
+  /* Hide desktop toggle button on mobile */
   .mobile-toggle-btn {
     display: none !important;
   }
 
-  /* Remove overlay styles */
-  .sidebar.open {
+  /* Ensure chat area is scrollable */
+  .chat-panel > div:first-child {
+    overflow-y: auto !important;
+    height: 100% !important;
+  }
+
+  /* Mobile chat specific */
+  .mobile-chat {
+    height: 55vh !important;
+    min-height: 55vh !important;
+  }
+}
+
+/* Desktop: sidebar and chat side by side */
+@media (min-width: 769px) {
+  .sidebar {
+    position: relative !important;
     transform: none !important;
+  }
+
+  .chat-panel {
+    position: relative !important;
+  }
+
+  .mobile-toggle-btn {
+    display: flex !important;
+  }
+
+  .mobile-sidebar {
+    height: 100% !important;
+  }
+
+  .mobile-sidebar-content {
+    overflow-y: auto !important;
   }
 }
 

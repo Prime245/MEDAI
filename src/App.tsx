@@ -71,6 +71,17 @@ export default function App() {
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [riskLevel, setRiskLevel] = useState<'low' | 'medium' | 'high' | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 769);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [forwardingId, setForwardingId] = useState<string | null>(null);
@@ -332,10 +343,14 @@ export default function App() {
         animate={{ width: isSidebarOpen ? 320 : 0 }}
         className={cn(
           "sidebar bg-white border-slate-200 overflow-hidden flex flex-col shadow-xl z-20",
-          isRTL ? "border-l" : "border-r"
+          isRTL ? "border-l" : "border-r",
+          isMobile && "mobile-sidebar"
         )}
       >
-        <div className="p-6 flex flex-col h-full min-w-[320px]">
+        <div className={cn(
+          "p-6 flex flex-col h-full",
+          isMobile ? "mobile-sidebar-content" : "min-w-[320px]"
+        )}>
           <div className="flex items-center gap-3 mb-8">
             <div className="p-2 bg-blue-600 rounded-xl text-white">
               <Stethoscope size={24} />
@@ -501,7 +516,10 @@ export default function App() {
       </motion.aside>
 
       {/* Main Content */}
-      <main className="chat-panel flex-1 flex flex-col relative overflow-hidden">
+      <main className={cn(
+        "chat-panel flex-1 flex flex-col relative overflow-hidden",
+        isMobile && "mobile-chat"
+      )}>
         {/* Header */}
         <header className="mobile-header bg-white/80 backdrop-blur-md border-b border-slate-100 p-4 flex items-center justify-between sticky top-0 z-10">
           <button 
