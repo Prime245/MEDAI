@@ -58,6 +58,15 @@ button:active {
     height: 40vh !important;
     transform: none !important;
     z-index: 1 !important;
+    overflow: hidden !important;
+  }
+
+  /* Make sidebar inner content scrollable */
+  .sidebar > div {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 100% !important;
+    padding-bottom: 1rem !important;
   }
 
   /* Chat panel - visible at bottom */
