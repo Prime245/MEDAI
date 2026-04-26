@@ -97,6 +97,7 @@ export default function App() {
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'online'>('card');
   const [scheduledAppointment, setScheduledAppointment] = useState<Doctor | null>(null);
   const [medicalRecords, setMedicalRecords] = useState<{name: string, date: string, type: string}[]>([]);
+  const [mobileFeatureModal, setMobileFeatureModal] = useState<'symptoms' | 'language' | 'doctors' | 'history' | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const medicalFileInputRef = useRef<HTMLInputElement>(null);
@@ -325,6 +326,300 @@ export default function App() {
             </AnimatePresence>
           </div>
         </motion.div>
+      </div>
+    );
+  }
+
+  // Mobile UI Render
+  if (isMobile) {
+    return (
+      <div className="mobile-ui-container" dir={isRTL ? 'rtl' : 'ltr'}>
+        {/* Mobile Header */}
+        <div className="mobile-header-bar">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-blue-600 rounded-lg text-white">
+              <Stethoscope size={16} />
+            </div>
+            <span className="text-sm font-bold text-blue-600">MedAI</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-slate-400">AI Online</span>
+            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+              <User size={14} className="text-blue-600" />
+            </div>
+          </div>
+        </div>
+
+        {/* Feature Buttons Bar */}
+        <div className="mobile-feature-bar">
+          <button onClick={() => setMobileFeatureModal('symptoms')} className="mobile-feature-btn">
+            🩺 Symptoms
+          </button>
+          <button onClick={() => setMobileFeatureModal('language')} className="mobile-feature-btn">
+            🌐 Language
+          </button>
+          <button onClick={() => setMobileFeatureModal('doctors')} className="mobile-feature-btn">
+            👨‍⚕️ Doctors
+          </button>
+          <button onClick={() => setMobileFeatureModal('history')} className="mobile-feature-btn">
+            📋 History
+          </button>
+        </div>
+
+        {/* Risk Badge */}
+        {riskLevel && (
+          <div className={cn(
+            "mobile-risk-badge",
+            riskLevel === 'high' && "mobile-risk-high",
+            riskLevel === 'medium' && "mobile-risk-medium",
+            riskLevel === 'low' && "mobile-risk-low"
+          )}>
+            <AlertTriangle size={10} className="inline mr-1" />
+            {riskLevel} Risk
+          </div>
+        )}
+
+        {/* Selected Symptoms Chips */}
+        {selectedSymptoms.length > 0 && (
+          <div className="mobile-symptoms-chips" style={{ marginTop: '100px', marginLeft: '1rem', marginRight: '1rem' }}>
+            {selectedSymptoms.map(symptom => (
+              <span key={symptom} className="mobile-symptom-chip">
+                {symptom} ×
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Chat Area */}
+        <div className="mobile-chat-area" style={{ marginTop: '100px' }}>
+          {messages.map((msg) => (
+            <motion.div
+              key={msg.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={cn(
+                "flex max-w-[85%] flex-col mb-4",
+                msg.role === 'user' ? "ml-auto items-end" : "mr-auto items-start"
+              )}
+            >
+              <div className={cn(
+                "p-3 rounded-2xl text-xs",
+                msg.role === 'user' 
+                  ? "bg-blue-600 text-white rounded-br-none" 
+                  : "bg-white border border-slate-100 text-slate-700 rounded-bl-none shadow-sm"
+              )}>
+                {msg.content}
+                {msg.risk && (
+                  <div className={cn(
+                    "mt-2 pt-2 border-t text-[10px] font-bold",
+                    msg.risk === 'high' ? "text-red-400" : 
+                    msg.risk === 'medium' ? "text-amber-600" : 
+                    "text-emerald-600"
+                  )}>
+                    Risk: {msg.risk.toUpperCase()}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          ))}
+          {isLoading && (
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
+                <Bot size={12} className="text-white" />
+              </div>
+              <div className="flex gap-1">
+                <span className="w-2 h-2 bg-slate-300 rounded-full animate-bounce"></span>
+                <span className="w-2 h-2 bg-slate-300 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                <span className="w-2 h-2 bg-slate-300 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Input Bar */}
+        <div className="mobile-input-bar">
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            className="p-2 text-slate-500"
+          >
+            <ImageIcon size={20} />
+          </button>
+          <input 
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+            placeholder={t.placeholder}
+            className="flex-1 bg-slate-100 rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+          />
+          <button 
+            onClick={toggleListening}
+            className={cn(
+              "p-2 rounded-full",
+              isListening ? "bg-red-100 text-red-600" : "text-slate-500"
+            )}
+          >
+            {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+          </button>
+          <button
+            onClick={handleSendMessage}
+            disabled={isLoading}
+            className="p-2 bg-blue-600 text-white rounded-full disabled:opacity-50"
+          >
+            <Send size={20} />
+          </button>
+        </div>
+
+        {/* Feature Modal */}
+        <AnimatePresence>
+          {mobileFeatureModal && (
+            <div className="mobile-feature-modal" onClick={() => setMobileFeatureModal(null)}>
+              <motion.div 
+                initial={{ y: 100 }}
+                animate={{ y: 0 }}
+                exit={{ y: 100 }}
+                className="mobile-feature-modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold text-slate-800">
+                    {mobileFeatureModal === 'symptoms' && 'Select Symptoms'}
+                    {mobileFeatureModal === 'language' && 'Select Language'}
+                    {mobileFeatureModal === 'doctors' && 'Available Doctors'}
+                    {mobileFeatureModal === 'history' && 'Session History'}
+                  </h3>
+                  <button onClick={() => setMobileFeatureModal(null)} className="p-2">
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {/* Symptoms Modal */}
+                {mobileFeatureModal === 'symptoms' && (
+                  <div className="flex flex-wrap gap-2">
+                    {t.symptomOptions.map(symptom => (
+                      <button
+                        key={symptom}
+                        onClick={() => toggleSymptom(symptom)}
+                        className={cn(
+                          "px-3 py-2 rounded-full text-xs font-medium",
+                          selectedSymptoms.includes(symptom)
+                            ? "bg-blue-600 text-white"
+                            : "bg-slate-100 text-slate-600"
+                        )}
+                      >
+                        {symptom}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Language Modal */}
+                {mobileFeatureModal === 'language' && (
+                  <div className="grid grid-cols-2 gap-2">
+                    {(['en', 'ur', 'ar', 'hi'] as Language[]).map((l) => (
+                      <button
+                        key={l}
+                        onClick={() => setLang(l)}
+                        className={cn(
+                          "p-3 rounded-lg text-sm font-medium",
+                          lang === l 
+                            ? "bg-blue-600 text-white" 
+                            : "bg-slate-100 text-slate-600"
+                        )}
+                      >
+                        {l.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Doctors Modal */}
+                {mobileFeatureModal === 'doctors' && (
+                  <div className="space-y-3">
+                    {DOCTORS.map(doc => (
+                      <div key={doc.id} className="p-3 bg-slate-50 rounded-xl flex items-center gap-3">
+                        <img src={doc.image} alt={doc.name} className="w-12 h-12 rounded-full" />
+                        <div className="flex-1">
+                          <h4 className="text-sm font-bold">{doc.name}</h4>
+                          <p className="text-xs text-blue-600">{doc.specialty}</p>
+                          <span className={cn(
+                            "text-[10px] font-bold",
+                            doc.status === 'available' ? "text-emerald-600" : "text-red-500"
+                          )}>
+                            {doc.status === 'available' ? 'Available' : 'Busy'}
+                          </span>
+                        </div>
+                        <button 
+                          onClick={() => setActiveMessageModal(doc)}
+                          className="p-2 bg-blue-100 text-blue-600 rounded-lg"
+                        >
+                          <MessageSquare size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* History Modal */}
+                {mobileFeatureModal === 'history' && (
+                  <div className="p-3 bg-slate-50 rounded-xl">
+                    <p className="text-sm text-slate-600">{messages.length} messages in this session</p>
+                    <button 
+                      onClick={() => {
+                        setMessages([{
+                          id: Date.now().toString(),
+                          role: 'assistant',
+                          content: translations[lang].welcome,
+                          timestamp: new Date(),
+                        }]);
+                        setRiskLevel(null);
+                        setSelectedSymptoms([]);
+                      }}
+                      className="mt-3 w-full py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium"
+                    >
+                      Clear Chat
+                    </button>
+                  </div>
+                )}
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Message Modal */}
+        <AnimatePresence>
+          {activeMessageModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setActiveMessageModal(null)}>
+              <motion.div 
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                className="bg-white rounded-2xl w-full max-w-sm p-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <img src={activeMessageModal.image} alt="" className="w-12 h-12 rounded-full" />
+                  <div>
+                    <h3 className="font-bold">{activeMessageModal.name}</h3>
+                    <p className="text-xs text-blue-600">{activeMessageModal.specialty}</p>
+                  </div>
+                </div>
+                <textarea
+                  value={directMsg}
+                  onChange={(e) => setDirectMsg(e.target.value)}
+                  placeholder="Type message..."
+                  className="w-full h-20 p-3 bg-slate-50 rounded-xl text-sm resize-none"
+                />
+                <button
+                  onClick={handleDirectMessage}
+                  className="w-full mt-3 py-2 bg-blue-600 text-white rounded-xl font-medium"
+                >
+                  Send
+                </button>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     );
   }

@@ -41,90 +41,190 @@ button:active {
 
 /* ============================= */
 /* MOBILE LAYOUT FIX (MEDAI) */
-/* SIDEBAR AND CHAT STACKED + SCROLLABLE */
+/* SEPARATE MOBILE UI - NO SIDEBAR */
 /* ============================= */
 
 @media (max-width: 768px) {
-  /* Force vertical stack on main container */
+  /* Hide desktop layout */
   .flex.h-screen {
     flex-direction: column !important;
     height: 100vh !important;
     overflow: hidden !important;
   }
 
-  /* Sidebar - visible at top */
+  /* Hide sidebar completely on mobile */
+  .sidebar,
   .mobile-sidebar {
-    position: relative !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 45vh !important;
-    min-height: 45vh !important;
-    transform: none !important;
-    z-index: 1 !important;
-    overflow: hidden !important;
-    border-right: none !important;
-    border-bottom: 1px solid #e2e8f0 !important;
+    display: none !important;
   }
 
-  /* Mobile sidebar inner content - scrollable */
-  .mobile-sidebar-content {
+  /* Full screen chat */
+  .chat-panel,
+  .mobile-chat {
+    width: 100% !important;
     height: 100% !important;
-    max-height: 100% !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    padding: 1rem !important;
-    box-sizing: border-box !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
   }
 
-  /* Chat panel - visible at bottom */
-  .chat-panel {
-    width: 100% !important;
-    height: 55vh !important;
-    min-height: 55vh !important;
-    position: relative !important;
-    overflow: hidden !important;
-  }
-
-  /* Hide desktop toggle button on mobile */
+  /* Hide desktop header toggle */
   .mobile-toggle-btn {
     display: none !important;
   }
 
-  /* Ensure chat area is scrollable */
-  .chat-panel > div:first-child {
-    overflow-y: auto !important;
-    height: 100% !important;
+  /* Mobile-specific container */
+  .mobile-ui-container {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: hidden !important;
+    background: #f8fafc !important;
   }
 
-  /* Mobile chat specific */
-  .mobile-chat {
-    height: 55vh !important;
-    min-height: 55vh !important;
+  /* Mobile chat area */
+  .mobile-chat-area {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 1rem !important;
+    padding-bottom: 80px !important; /* Space for input */
+  }
+
+  /* Fixed chat input bar */
+  .mobile-input-bar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    padding: 0.75rem !important;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
+    z-index: 100 !important;
+    display: flex !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+  }
+
+  /* Feature buttons row */
+  .mobile-feature-bar {
+    position: fixed !important;
+    top: 60px !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    padding: 0.5rem 1rem !important;
+    display: flex !important;
+    gap: 0.5rem !important;
+    overflow-x: auto !important;
+    z-index: 50 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  }
+
+  .mobile-feature-btn {
+    flex-shrink: 0 !important;
+    padding: 0.5rem 1rem !important;
+    background: #f1f5f9 !important;
+    border: none !important;
+    border-radius: 9999px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+  }
+
+  .mobile-feature-btn:active {
+    transform: scale(0.95) !important;
+  }
+
+  /* Risk indicator corner */
+  .mobile-risk-badge {
+    position: fixed !important;
+    top: 70px !important;
+    right: 1rem !important;
+    padding: 0.25rem 0.75rem !important;
+    border-radius: 9999px !important;
+    font-size: 0.625rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    z-index: 40 !important;
+  }
+
+  .mobile-risk-low { background: #d1fae5; color: #059669; }
+  .mobile-risk-medium { background: #fef3c7; color: #d97706; }
+  .mobile-risk-high { background: #fee2e2; color: #dc2626; }
+
+  /* Mobile modal for features */
+  .mobile-feature-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0,0,0,0.5) !important;
+    z-index: 200 !important;
+    display: flex !important;
+    align-items: flex-end !important;
+  }
+
+  .mobile-feature-modal-content {
+    background: white !important;
+    width: 100% !important;
+    max-height: 70vh !important;
+    border-radius: 1rem 1rem 0 0 !important;
+    padding: 1.5rem !important;
+    overflow-y: auto !important;
+  }
+
+  /* Mobile header */
+  .mobile-header-bar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 60px !important;
+    background: white !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 1rem !important;
+    z-index: 60 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  }
+
+  /* Selected symptoms chips */
+  .mobile-symptoms-chips {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.25rem !important;
+    padding: 0.5rem !important;
+    background: #eff6ff !important;
+    border-radius: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .mobile-symptom-chip {
+    padding: 0.25rem 0.5rem !important;
+    background: #3b82f6 !important;
+    color: white !important;
+    border-radius: 9999px !important;
+    font-size: 0.625rem !important;
+    font-weight: 600 !important;
   }
 }
 
-/* Desktop: sidebar and chat side by side */
+/* Desktop: keep original layout */
 @media (min-width: 769px) {
+  .mobile-ui-container,
+  .mobile-feature-bar,
+  .mobile-input-bar,
+  .mobile-risk-badge,
+  .mobile-header-bar {
+    display: none !important;
+  }
+
   .sidebar {
-    position: relative !important;
-    transform: none !important;
-  }
-
-  .chat-panel {
-    position: relative !important;
-  }
-
-  .mobile-toggle-btn {
     display: flex !important;
-  }
-
-  .mobile-sidebar {
-    height: 100% !important;
-  }
-
-  .mobile-sidebar-content {
-    overflow-y: auto !important;
   }
 }
 
