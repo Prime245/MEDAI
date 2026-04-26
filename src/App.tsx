@@ -8,7 +8,7 @@ import {
   Phone, MessageSquare, ArrowRight, Check,
   RefreshCw, Video, VideoOff, Mic as MicIcon,
   UserCircle, LogOut, CreditCard, Landmark, Clock,
-  FileText, Upload, Calendar
+  FileText, Upload, Calendar, Lock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { translations, Language } from './translations';
@@ -239,6 +239,17 @@ export default function App() {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
+      // Start call timer
+      let seconds = 0;
+      const timerInterval = setInterval(() => {
+        seconds++;
+        const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const secs = (seconds % 60).toString().padStart(2, '0');
+        const timerEl = document.getElementById('call-timer');
+        if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+      }, 1000);
+      // Store interval reference for cleanup
+      (window as any).__callTimer = timerInterval;
     } catch (err) {
       toast.error("Could not access camera for video call");
       setActiveVideoCall(null);
@@ -246,10 +257,17 @@ export default function App() {
   };
 
   const endVideoCall = () => {
+    // Clear timer
+    const timerInterval = (window as any).__callTimer;
+    if (timerInterval) clearInterval(timerInterval);
+    (window as any).__callTimer = null;
+    
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
     }
     setActiveVideoCall(null);
+    setIsMuted(false);
+    setIsVideoOff(false);
     streamRef.current = null;
     toast("Video call ended", { icon: '📞' });
   };
@@ -1169,20 +1187,44 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="relative w-full max-w-4xl aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+              className="relative w-full max-w-5xl aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col"
             >
-              {/* Doctor's Camera (Simulated) */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                 <img src={activeVideoCall.image} alt="" className="w-full h-full object-cover opacity-50 blur-xl scale-110" />
-                 <div className="relative text-center">
-                    <img src={activeVideoCall.image} alt="" className="w-32 h-32 rounded-full border-4 border-white/20 mx-auto mb-4" />
-                    <h2 className="text-white text-2xl font-bold">{activeVideoCall.name}</h2>
-                    <p className="text-emerald-400 font-medium">{t.joining}</p>
-                 </div>
+              {/* Main Video Area - Doctor's Camera */}
+              <div className="flex-1 relative bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+                {/* Simulated Doctor Video Feed */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <div className="relative">
+                    <img 
+                      src={activeVideoCall.image} 
+                      alt={activeVideoCall.name} 
+                      className="w-40 h-40 rounded-full border-4 border-emerald-500/30 shadow-2xl"
+                    />
+                    <div className="absolute bottom-0 right-0 w-6 h-6 bg-emerald-500 rounded-full border-4 border-slate-900"></div>
+                  </div>
+                  <h2 className="text-white text-2xl font-bold mt-6">{activeVideoCall.name}</h2>
+                  <p className="text-emerald-400 font-medium mt-2">{t.joining}</p>
+                  {/* Animated dots */}
+                  <div className="flex gap-2 mt-4">
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  </div>
+                </div>
+                
+                {/* Connection status badge */}
+                <div className="absolute top-6 left-6 flex items-center gap-2 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                  <span className="text-white/80 text-sm font-medium">Connected</span>
+                </div>
+                
+                {/* Timer */}
+                <div className="absolute top-6 right-6 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full">
+                  <span className="text-white/80 text-sm font-medium" id="call-timer">00:00</span>
+                </div>
               </div>
 
-              {/* User's Camera Feed */}
-              <div className="absolute top-6 right-6 w-48 aspect-video bg-slate-800 rounded-2xl border-2 border-white/10 overflow-hidden shadow-xl z-10">
+              {/* User's Camera Feed - Picture in Picture */}
+              <div className="absolute top-6 right-6 w-56 aspect-video bg-slate-800 rounded-2xl border-2 border-white/10 overflow-hidden shadow-xl z-10">
                 {!isVideoOff ? (
                   <video 
                     ref={videoRef} 
@@ -1192,44 +1234,54 @@ export default function App() {
                     className="w-full h-full object-cover scale-x-[-1]" 
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-white">
-                    <VideoOff size={32} className="opacity-40" />
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-slate-800">
+                    <VideoOff size={32} className="text-white/40 mb-2" />
+                    <span className="text-white/40 text-xs">Camera Off</span>
                   </div>
                 )}
+                <div className="absolute bottom-2 left-3 text-white/60 text-[10px] font-medium">You</div>
               </div>
 
-              {/* Controls */}
-              <div className="mt-auto relative z-10 p-8 flex justify-center items-center gap-6 bg-gradient-to-t from-black/80 to-transparent">
+              {/* Controls Bar */}
+              <div className="mt-auto relative z-10 p-6 pb-8 flex justify-center items-center gap-4 bg-gradient-to-t from-black/90 to-transparent">
+                {/* Mute Button */}
                 <button 
                   onClick={() => setIsMuted(!isMuted)}
                   className={cn(
-                    "p-4 rounded-full transition-all",
-                    isMuted ? "bg-red-500 text-white" : "bg-white/10 text-white hover:bg-white/20"
+                    "p-4 rounded-full transition-all hover:scale-110",
+                    isMuted ? "bg-red-500 text-white shadow-lg shadow-red-500/30" : "bg-white/10 text-white hover:bg-white/20"
                   )}
+                  title={isMuted ? "Unmute" : "Mute"}
                 >
                   {isMuted ? <MicOff size={24} /> : <MicIcon size={24} />}
                 </button>
                 
+                {/* End Call Button */}
                 <button 
                   onClick={endVideoCall}
-                  className="p-5 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all shadow-lg"
+                  className="p-5 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all hover:scale-110 shadow-lg shadow-red-600/30"
+                  title="End Call"
                 >
                   <Phone size={28} className="rotate-[135deg]" />
                 </button>
 
+                {/* Video Toggle Button */}
                 <button 
                   onClick={() => setIsVideoOff(!isVideoOff)}
                   className={cn(
-                    "p-4 rounded-full transition-all",
-                    isVideoOff ? "bg-red-500 text-white" : "bg-white/10 text-white hover:bg-white/20"
+                    "p-4 rounded-full transition-all hover:scale-110",
+                    isVideoOff ? "bg-red-500 text-white shadow-lg shadow-red-500/30" : "bg-white/10 text-white hover:bg-white/20"
                   )}
+                  title={isVideoOff ? "Turn on camera" : "Turn off camera"}
                 >
                   {isVideoOff ? <VideoOff size={24} /> : <Video size={24} />}
                 </button>
               </div>
 
-              <div className="absolute bottom-10 left-8 z-10 text-white/60 text-sm font-medium">
-                Encrypted Peer-to-Peer Connection
+              {/* Bottom Info */}
+              <div className="absolute bottom-24 left-8 z-10 flex items-center gap-2 text-white/50 text-xs">
+                <Lock size={12} />
+                <span>End-to-end encrypted</span>
               </div>
             </motion.div>
           </div>
