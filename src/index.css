@@ -41,69 +41,51 @@ button:active {
 
 /* ============================= */
 /* MOBILE LAYOUT FIX (MEDAI) */
-/* ONLY APPLIES ON MOBILE */
+/* SIDEBAR AND CHAT VISIBLE TOGETHER */
 /* ============================= */
 
 @media (max-width: 768px) {
-
-  body {
-    overflow-x: hidden;
-  }
-
-  /* MAIN LAYOUT → STACK VERTICALLY ON MOBILE */
-  .main-container {
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100vh;
-  }
-
-  /* SIDEBAR → TOP SECTION */
-  .sidebar {
-    position: relative !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 35vh;
-    overflow-y: auto;
-    background: white;
-    border-bottom: 1px solid #e5e7eb;
-  }
-
-  /* CHAT PANEL → BOTTOM SECTION */
-  .chat-panel {
-    width: 100% !important;
-    height: 65vh;
-    overflow-y: auto;
-  }
-
-  /* SAFETY RESET (prevents old flex rules breaking layout) */
-  .chat-panel,
-  .sidebar {
-    margin-left: 0 !important;
-  }
-
-  /* OPTIONAL: smooth scrolling */
-  .sidebar,
-  .chat-panel {
-    scroll-behavior: smooth;
-  }
-}
-@media (max-width: 768px) {
-  /* FORCE FLEX COLUMN ON MAIN WRAPPER */
+  /* Force vertical stack on main container */
   .flex.h-screen {
     flex-direction: column !important;
   }
 
-  /* LEFT PANEL (sidebar) */
-  .flex.h-screen > div:first-child {
+  /* Sidebar - visible at top */
+  .sidebar {
+    position: relative !important;
     width: 100% !important;
-    height: 35vh !important;
-    overflow-y: auto;
+    max-width: 100% !important;
+    height: 40vh !important;
+    transform: none !important;
+    z-index: 1 !important;
   }
 
-  /* RIGHT PANEL (chat) */
-  .flex.h-screen > div:last-child {
+  /* Chat panel - visible at bottom */
+  .chat-panel {
     width: 100% !important;
-    height: 65vh !important;
-    overflow-y: auto;
+    height: 60vh !important;
+    position: relative !important;
+  }
+
+  /* Hide mobile toggle button */
+  .mobile-toggle-btn {
+    display: none !important;
+  }
+
+  /* Remove overlay styles */
+  .sidebar.open {
+    transform: none !important;
+  }
+}
+
+/* Desktop: sidebar and chat side by side */
+@media (min-width: 769px) {
+  .sidebar {
+    position: relative !important;
+    transform: none !important;
+  }
+
+  .chat-panel {
+    position: relative !important;
   }
 }

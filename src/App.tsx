@@ -331,7 +331,7 @@ export default function App() {
         initial={false}
         animate={{ width: isSidebarOpen ? 320 : 0 }}
         className={cn(
-          "bg-white border-slate-200 overflow-hidden flex flex-col shadow-xl z-20",
+          "sidebar bg-white border-slate-200 overflow-hidden flex flex-col shadow-xl z-20",
           isRTL ? "border-l" : "border-r"
         )}
       >
@@ -501,12 +501,12 @@ export default function App() {
       </motion.aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col relative overflow-hidden">
+      <main className="chat-panel flex-1 flex flex-col relative overflow-hidden">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-md border-b border-slate-100 p-4 flex items-center justify-between sticky top-0 z-10">
+        <header className="mobile-header bg-white/80 backdrop-blur-md border-b border-slate-100 p-4 flex items-center justify-between sticky top-0 z-10">
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 hover:bg-slate-100 rounded-lg text-slate-600"
+            className="mobile-toggle-btn p-2 hover:bg-slate-100 rounded-lg text-slate-600"
           >
             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
