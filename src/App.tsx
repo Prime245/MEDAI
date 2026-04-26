@@ -419,6 +419,34 @@ export default function App() {
                     Risk: {msg.risk.toUpperCase()}
                   </div>
                 )}
+                {msg.role === 'assistant' && !msg.isForwarded && (
+                  <div className="mt-2 pt-2 border-t">
+                    <p className="text-[9px] text-slate-400 mb-1 uppercase font-bold">Forward to:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {DOCTORS.map(doc => (
+                        <button
+                          key={doc.id}
+                          onClick={() => forwardCase(msg.id, doc.name)}
+                          disabled={forwardingId === msg.id}
+                          className="flex items-center gap-1 px-2 py-1 bg-slate-50 hover:bg-blue-50 text-slate-500 hover:text-blue-600 rounded text-[9px] font-medium transition-all"
+                        >
+                          {forwardingId === msg.id ? (
+                            <RefreshCw size={8} className="animate-spin" />
+                          ) : (
+                            <ArrowRight size={8} />
+                          )}
+                          {doc.name.split(' ').slice(1).join(' ')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {msg.isForwarded && (
+                  <div className="mt-2 flex items-center gap-1 text-emerald-500 font-bold text-[9px]">
+                    <Check size={10} />
+                    Case Forwarded
+                  </div>
+                )}
               </div>
             </motion.div>
           ))}
@@ -554,6 +582,21 @@ export default function App() {
                           className="p-2 bg-blue-100 text-blue-600 rounded-lg"
                         >
                           <MessageSquare size={16} />
+                        </button>
+                        <button 
+                          onClick={() => {
+                            if (doc.status === 'available') {
+                              setPaymentDoctor(doc);
+                              setMobileFeatureModal(null);
+                            }
+                          }}
+                          disabled={doc.status === 'busy'}
+                          className={cn(
+                            "p-2 rounded-lg",
+                            doc.status === 'available' ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-400"
+                          )}
+                        >
+                          <Video size={16} />
                         </button>
                       </div>
                     ))}
